@@ -7,7 +7,33 @@ on:
       - main
 
 jobs:
-  php-cs-fixer:
+  Run-PSScriptAnalyzer-on-Windows:
+    name: Run PSScriptAnalyzer on Windows
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install PSScriptAnalyzer module
+        shell: pwsh
+        run: |
+          Set-PSRepository PSGallery -InstallationPolicy Trusted
+          Install-Module PSScriptAnalyzer -ErrorAction Stop
+      - name: Get list of rules
+        shell: pwsh
+        run: |
+          Get-ScriptAnalyzerRule
+
+
+jobs:
+  Run-npm-on-Ubuntu:
+    name: Run npm on Ubuntu
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '14'
+      - run: cp config /github/home/.config/calcurse/caldav/config
+Sync-Calendar:
     runs-on: ubuntu-latest
 
     permissions:
@@ -19,9 +45,6 @@ jobs:
     - uses: actions/checkout@v3
       with:
         ref: ${{ github.head_ref }}
-    - run: |
-      cp config /github/home/.config/calcurse/caldav/config
-
 
     - name: Run sync
       uses: docker://publicrant/streamlit-test
@@ -29,3 +52,25 @@ jobs:
     - uses: stefanzweifel/git-auto-commit-action@v4
       with:
         commit_message: Apply calendar changes
+
+    # Building a multiline commit message
+    # Adjust to your liking
+    - run: echo "Commit Message 1" >> commitmessage.txt
+    - run: echo "Commit Message 2" >> commitmessage.txt
+    - run: echo "Commit Message 3" >> commitmessage.txt
+
+    # Create a multiline string to be used by the git-auto-commit Action
+    - name: Set commit message
+      id: commit_message_step
+      run: |
+        echo 'commit_message<<EOF' >> $GITHUB_OUTPUT
+        cat commitmessage.txt >> $GITHUB_OUTPUT
+        echo 'EOF' >> $GITHUB_OUTPUT
+
+    # Quick and dirty step to get rid of the temporary file holding the commit message
+    - run: rm -rf commitmessage.txt
+
+    - uses: stefanzweifel/git-auto-commit-action@v4
+      id: commit
+      with:
+        commit_message: ${{ steps.commit_message_step.outputs.commit_message }}
