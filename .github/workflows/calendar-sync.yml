@@ -1,4 +1,4 @@
-name: calendar sync
+name: calendar-sync
 
 on:
   pull_request:
@@ -7,33 +7,7 @@ on:
       - main
 
 jobs:
-  Run-PSScriptAnalyzer-on-Windows:
-    name: Run PSScriptAnalyzer on Windows
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Install PSScriptAnalyzer module
-        shell: pwsh
-        run: |
-          Set-PSRepository PSGallery -InstallationPolicy Trusted
-          Install-Module PSScriptAnalyzer -ErrorAction Stop
-      - name: Get list of rules
-        shell: pwsh
-        run: |
-          Get-ScriptAnalyzerRule
-
-
-jobs:
-  Run-npm-on-Ubuntu:
-    name: Run npm on Ubuntu
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '14'
-      - run: cp config /github/home/.config/calcurse/caldav/config
-Sync-Calendar:
+  php-cs-fixer:
     runs-on: ubuntu-latest
 
     permissions:
@@ -41,12 +15,11 @@ Sync-Calendar:
       contents: write
 
     steps:
-    - name: create config
     - uses: actions/checkout@v3
       with:
         ref: ${{ github.head_ref }}
 
-    - name: Run sync
+    - name: Run php-cs-fixer
       uses: docker://publicrant/streamlit-test
 
     - uses: stefanzweifel/git-auto-commit-action@v4
