@@ -5,7 +5,7 @@ on:
       branches:
         - main
 env:
-    IMAGE: "public-rant/streamlit-test"
+    IMAGE: "publicrant/streamlit-test"
     PLATFORMS: linux/amd64
 
 jobs:
