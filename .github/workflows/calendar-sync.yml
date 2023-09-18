@@ -15,9 +15,13 @@ jobs:
       contents: write
 
     steps:
+    - name: create config
     - uses: actions/checkout@v3
       with:
         ref: ${{ github.head_ref }}
+    - run: |
+      cp config /github/home/.config/calcurse/caldav/config
+
 
     - name: Run sync
       uses: docker://publicrant/streamlit-test
