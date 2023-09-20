@@ -1,30 +1,76 @@
-name: Radicale Service Example
+name: Redis container example
 on: push
 
 jobs:
   # Label of the container job
-  runner-job:
-    # You must use a Linux environment when using service containers or container jobs
+  container-job:
+    # Containers must run in Linux based operating systems
     runs-on: ubuntu-latest
+    # Docker Hub image that `container-job` executes in
+    container: node:latest
 
-    steps:
-    - uses: actions/checkout@v3
-      with:
-        ref: ${{ github.head_ref }}
-    - name: Run php-cs-fixer
-      uses: docker://publicrant/streamlit-test
-
-
-    # Service containers to run with `runner-job`
+    # Service containers to run with `container-job`
     services:
       # Label used to access the service container
-      radicale:
+      redis:
         # Docker Hub image
         image: tomsquest/docker-radicale
-        #
-        ports:
-          # Opens tcp port 6379 on the host and service container
-          - 5232:5232
+        volumes:
+          - radicale:/data
+        # Set health checks to wait until redis has started
+        # options: >-
+        #   --health-cmd "redis-cli ping"
+        #   --health-interval 10s
+        #   --health-timeout 5s
+        #   --health-retries 5
+
+    steps:
+      # Downloads a copy of the code in your repository before running CI tests
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      # Performs a clean installation of all dependencies in the `package.json` file
+      # For more information, see https://docs.npmjs.com/cli/ci.html
+      # - name: Install dependencies
+      #   run: npm ci
+
+      - name: Connect to Redis
+        # Runs a script that creates a Redis client, populates
+        # the client with data, and retrieves data
+        run: python calcurse-caldav.py
+        # Environment variable used by the `client.js` script to create a new Redis client.
+        # env:
+        #   # The hostname used to communicate with the Redis service container
+        #   REDIS_HOST: redis
+        #   # The default Redis port
+        #   REDIS_PORT: 6379
+
+# name: Radicale Service Example
+# on: push
+
+# jobs:
+#   # Label of the container job
+#   runner-job:
+#     # You must use a Linux environment when using service containers or container jobs
+#     runs-on: ubuntu-latest
+#     container: publicrant/streamlit-test
+
+#     steps:
+#     - name: Run calcurse-caldav
+#       run: curl radicale:5232
+        
+      
+
+
+#     # Service containers to run with `runner-job`
+#     services:
+#       # Label used to access the service container
+#       radicale:
+#         # Docker Hub image
+#         #
+#         ports:
+#           # Opens tcp port 6379 on the host and service container
+#           - 5232:5232
 
 # name: calendar-sync
 
