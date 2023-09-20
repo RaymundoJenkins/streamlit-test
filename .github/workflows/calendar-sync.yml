@@ -1,27 +1,55 @@
-name: calendar-sync
-
-on:
-  pull_request:
-  push:
-    branches:
-      - main
+name: Radicale Service Example
+on: push
 
 jobs:
-  php-cs-fixer:
+  # Label of the container job
+  runner-job:
+    # You must use a Linux environment when using service containers or container jobs
     runs-on: ubuntu-latest
-
-    permissions:
-      # Give the default GITHUB_TOKEN write permission to commit and push the changed files back to the repository.
-      contents: write
 
     steps:
     - uses: actions/checkout@v3
       with:
         ref: ${{ github.head_ref }}
-
     - name: Run php-cs-fixer
       uses: docker://publicrant/streamlit-test
 
-    - uses: stefanzweifel/git-auto-commit-action@v4
-      with:
-        commit_message: Apply calendar changes
+
+    # Service containers to run with `runner-job`
+    services:
+      # Label used to access the service container
+      radicale:
+        # Docker Hub image
+        image: tomsquest/docker-radicale
+        #
+        ports:
+          # Opens tcp port 6379 on the host and service container
+          - 5232:5232
+
+# name: calendar-sync
+
+# on:
+#   pull_request:
+#   push:
+#     branches:
+#       - main
+
+# jobs:
+#   php-cs-fixer:
+#     runs-on: ubuntu-latest
+
+#     permissions:
+#       # Give the default GITHUB_TOKEN write permission to commit and push the changed files back to the repository.
+#       contents: write
+
+#     steps:
+#     - uses: actions/checkout@v3
+#       with:
+#         ref: ${{ github.head_ref }}
+
+#     - name: Run php-cs-fixer
+#       uses: docker://publicrant/streamlit-test
+
+#     - uses: stefanzweifel/git-auto-commit-action@v4
+#       with:
+#         commit_message: Apply calendar changes

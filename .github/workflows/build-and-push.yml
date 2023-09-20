@@ -44,7 +44,7 @@ jobs:
                   tags: |
                       ${{env.IMAGE}}:latest
                       ${{env.IMAGE}}:${{env.RELEASE_VERSION}}
-                  file: Dockerfile
+                  file: packages/streamlit-test/Dockerfile
                   context: .
                   cache-from: type=gha
                   cache-to: type=gha,mode=max
